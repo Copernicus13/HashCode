@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Google.HashCode.ConsoleApplication;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Google.HashCode.Tests
 {
@@ -8,6 +9,7 @@ namespace Google.HashCode.Tests
     public class UnitTest1
     {
         [Test]
+        [ExcludeFromCodeCoverage]
         public void TestMethod1_WithTrue()
         {
             // Arrange
@@ -22,6 +24,7 @@ namespace Google.HashCode.Tests
         }
 
         [Test]
+        [ExcludeFromCodeCoverage]
         public void TestMethod1_WithFalse()
         {
             // Arrange
@@ -36,6 +39,7 @@ namespace Google.HashCode.Tests
         }
 
         [Test]
+        [ExcludeFromCodeCoverage]
         public void TestMethod2()
         {
             // Just a test...
