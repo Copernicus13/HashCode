@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Google.HashCode.ConsoleApplication;
 
 namespace Google.HashCode.Tests
 {
@@ -7,10 +8,31 @@ namespace Google.HashCode.Tests
     public class UnitTest1
     {
         [Test]
-        public void TestMethod1()
+        public void TestMethod1_WithTrue()
         {
-            // Just a test...
-            Assert.IsTrue(true);
+            // Arrange
+            var c = new Class1();
+            var expected = "I";
+
+            // Act
+            var actual = c.Method1(true);
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void TestMethod1_WithFalse()
+        {
+            // Arrange
+            var c = new Class1();
+            var expected = "O";
+
+            // Act
+            var actual = c.Method1(false);
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [Test]
