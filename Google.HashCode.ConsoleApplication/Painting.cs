@@ -13,7 +13,7 @@ namespace Google.HashCode.ConsoleApplication
     public class Painting
     {
         /// <summary>
-        /// Zone de dessin.
+        /// Zone de dessin sous forme de tableau à 2 dimensions.
         /// </summary>
         public char[,] DrawingZone { get; set; }
 
@@ -34,14 +34,31 @@ namespace Google.HashCode.ConsoleApplication
         /// <param name="rowsCount">Nombre de lignes (ordonnées, y).</param>
         public Painting(int columnsCount, int rowsCount)
         {
-            ColumnsCount = columnsCount;
-            RowsCount = rowsCount;
-            DrawingZone = new char[columnsCount, rowsCount];
+            this.RowsCount = rowsCount;
+            this.ColumnsCount = columnsCount;
+            this.DrawingZone = new char[columnsCount, rowsCount];
 
             // Fill drawing zone with blanks :
-            for (int columnIndex = 0; columnIndex < columnsCount; columnIndex++)
-                for (int rowIndex = 0; rowIndex < rowsCount; rowIndex++)
-                    this.DrawingZone[columnIndex, rowIndex] = '.';
+            for (int rowIndex = 0; rowIndex < this.RowsCount; rowIndex++)
+                for (int columnIndex = 0; columnIndex < this.ColumnsCount; columnIndex++)
+                    this.DrawingZone[rowIndex, columnIndex] = '.';
+        }
+
+        /// <summary>
+        /// Initialise une nouvelle instance de la zone de dessin
+        /// avec un dessin spécifié.
+        /// </summary>
+        public Painting(string drawing)
+        {
+            var rows = drawing.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            this.RowsCount = rows.Length;
+            this.ColumnsCount = rows[0].Length;
+            this.DrawingZone = new char[this.RowsCount, this.ColumnsCount];
+
+            // Fill drawing zone :
+            for (int rowIndex = 0; rowIndex < this.RowsCount; rowIndex++)
+                for (int columnIndex = 0; columnIndex < this.ColumnsCount; columnIndex++)
+                    this.DrawingZone[rowIndex, columnIndex] = rows[rowIndex][columnIndex];
         }
 
         /// <summary>
@@ -75,10 +92,10 @@ namespace Google.HashCode.ConsoleApplication
         }
 
         /// <summary>
-        /// Peint le point représenté par l'abscisse et l'ordonnée spécifiées.
+        /// Paint the point given by abscissa and ordinate.
         /// </summary>
-        /// <param name="columnIndex">Abscisse (x).</param>
-        /// <param name="rowIndex">Ordonnée (y).</param>
+        /// <param name="columnIndex">Abscissa (x).</param>
+        /// <param name="rowIndex">Ordinate (y).</param>
         public void Paint(int columnIndex, int rowIndex)
         {
             if (!this.ContainsAbscissa(columnIndex))
@@ -86,7 +103,30 @@ namespace Google.HashCode.ConsoleApplication
             if (!this.ContainsOrdinate(rowIndex))
                 throw new ArgumentOutOfRangeException("rowIndex");
 
-            this.DrawingZone[columnIndex, rowIndex] = '#';
+            this.DrawingZone[rowIndex, columnIndex] = '#';
+        }
+
+        public void Display()
+        {
+            for (int rowIndex = 0; rowIndex < this.RowsCount; rowIndex++)
+            {
+                for (int columnIndex = 0; columnIndex < this.ColumnsCount; columnIndex++)
+                    Console.Write(this.DrawingZone[rowIndex, columnIndex]);
+                Console.WriteLine();
+            }
+        }
+
+        public override string ToString()
+        {
+            var capacity = (this.RowsCount * this.ColumnsCount) + this.RowsCount;
+            var draw = new StringBuilder(capacity);
+            for (int rowIndex = 0; rowIndex < this.RowsCount; rowIndex++)
+            {
+                for (int columnIndex = 0; columnIndex < this.ColumnsCount; columnIndex++)
+                    draw.Append(this.DrawingZone[rowIndex, columnIndex]);
+                draw.AppendLine();
+            }
+            return draw.ToString();
         }
     }
 }
