@@ -36,7 +36,7 @@ namespace Google.HashCode.ConsoleApplication
         {
             this.RowsCount = rowsCount;
             this.ColumnsCount = columnsCount;
-            this.DrawingZone = new char[columnsCount, rowsCount];
+            this.DrawingZone = new char[rowsCount, columnsCount];
 
             // Fill drawing zone with blanks :
             for (int rowIndex = 0; rowIndex < this.RowsCount; rowIndex++)
@@ -83,12 +83,12 @@ namespace Google.HashCode.ConsoleApplication
 
         private bool ContainsAbscissa(int columnIndex)
         {
-            return columnIndex >= 0 && columnIndex < ColumnsCount;
+            return columnIndex >= 0 && columnIndex < this.ColumnsCount;
         }
 
         private bool ContainsOrdinate(int rowIndex)
         {
-            return rowIndex >= 0 && rowIndex < RowsCount;
+            return rowIndex >= 0 && rowIndex < this.RowsCount;
         }
 
         /// <summary>

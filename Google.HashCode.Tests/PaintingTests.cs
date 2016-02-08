@@ -40,6 +40,7 @@ namespace Google.HashCode.Tests
             Assert.That(new Painting(1, 1).Contains(new Point(0, 1)), Is.False);
             Assert.That(new Painting(1, 1).Contains(new Point(1, 0)), Is.False);
             Assert.That(new Painting(1, 1).Contains(new Point(1, 1)), Is.False);
+            Assert.That(new Painting(3, 1).Contains(new Point(2, 0)), Is.True);
         }
 
         [Test]
