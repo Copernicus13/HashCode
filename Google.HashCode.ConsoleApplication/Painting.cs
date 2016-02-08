@@ -15,7 +15,7 @@ namespace Google.HashCode.ConsoleApplication
         /// <summary>
         /// Zone de dessin sous forme de tableau à 2 dimensions.
         /// </summary>
-        public char[,] DrawingZone { get; set; }
+        private char[,] DrawingZone { get; set; }
 
         /// <summary>
         /// Nombre de colonnes (abscisses, x).
@@ -106,13 +106,30 @@ namespace Google.HashCode.ConsoleApplication
             this.DrawingZone[rowIndex, columnIndex] = '#';
         }
 
+        /// <summary>
+        /// Erase the point given by abscissa and ordinate.
+        /// </summary>
+        /// <param name="columnIndex">Abscissa (x).</param>
+        /// <param name="rowIndex">Ordinate (y).</param>
+        public void Erase(int columnIndex, int rowIndex)
+        {
+            if (!this.ContainsAbscissa(columnIndex))
+                throw new ArgumentOutOfRangeException("columnIndex");
+            if (!this.ContainsOrdinate(rowIndex))
+                throw new ArgumentOutOfRangeException("rowIndex");
+
+            this.DrawingZone[rowIndex, columnIndex] = '.';
+        }
+
         public void Display()
         {
             for (int rowIndex = 0; rowIndex < this.RowsCount; rowIndex++)
             {
                 for (int columnIndex = 0; columnIndex < this.ColumnsCount; columnIndex++)
                     Console.Write(this.DrawingZone[rowIndex, columnIndex]);
-                Console.WriteLine();
+                // Draw a new line unless for the last row :
+                if (rowIndex < this.RowsCount - 1)
+                    Console.WriteLine();
             }
         }
 
@@ -124,9 +141,12 @@ namespace Google.HashCode.ConsoleApplication
             {
                 for (int columnIndex = 0; columnIndex < this.ColumnsCount; columnIndex++)
                     draw.Append(this.DrawingZone[rowIndex, columnIndex]);
-                draw.AppendLine();
+                // Draw a new line unless for the last row :
+                if (rowIndex < this.RowsCount - 1)
+                    draw.AppendLine();
             }
             return draw.ToString();
         }
+
     }
 }

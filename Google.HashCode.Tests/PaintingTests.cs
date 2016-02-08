@@ -19,7 +19,7 @@ namespace Google.HashCode.Tests
             var painting = new Painting(1, 1);
 
             // Assert :
-            Assert.That(painting.DrawingZone[0, 0], Is.EqualTo('.'));
+            Assert.That(painting.ToString(), Is.EqualTo("."));
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Google.HashCode.Tests
             painting.Paint(0, 0);
 
             // Assert :
-            Assert.That(painting.DrawingZone[0, 0], Is.EqualTo('#'));
+            Assert.That(painting.ToString(), Is.EqualTo("#"));
         }
 
         [Test]

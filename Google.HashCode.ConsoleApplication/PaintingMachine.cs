@@ -76,6 +76,18 @@ namespace Google.HashCode.ConsoleApplication
                     this.Painting.Paint(startColumnIndex, rowIndex);
         }
 
-        //ERASE_CELL R C - clears the cell [ R , C ].
+        /// <summary>
+        /// ERASE_CELL R C
+        /// Clears the cell [R, C].
+        /// </summary>
+        public void EraseCell(int rowIndex, int columnIndex)
+        {
+            // Validate command :
+            if (!this.Painting.Contains(new Point(columnIndex, rowIndex)))
+                throw new ArgumentOutOfRangeException("cell");
+
+            // Execute command :
+            this.Painting.Erase(columnIndex, rowIndex);
+        }
     }
 }
