@@ -76,5 +76,22 @@ namespace Google.HashCode.Tests
             // Assert :
             Assert.That(actualDraw, Is.EqualTo(actualDraw));
         }
+
+        [Test]
+        public void EraseCell()
+        {
+            // Arrange :
+            var draw = "###";
+            var painting = new Painting(draw);
+            var paintingMachine = new PaintingMachine(painting);
+            var expectedDraw = "##.";
+
+            // Act :
+            paintingMachine.EraseCell(0, 2);
+            var actualDraw = painting.ToString();
+
+            // Assert :
+            Assert.That(actualDraw, Is.EqualTo(actualDraw));
+        }
     }
 }
