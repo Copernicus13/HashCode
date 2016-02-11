@@ -6,6 +6,8 @@ namespace Google.HashCode.ConsoleApplication
 {
     public class Order
     {
+        public int Id { get; set; }
+
         public Point Destination { get; set; }
 
         public IList<int> NbItemsOfType { get; set; }

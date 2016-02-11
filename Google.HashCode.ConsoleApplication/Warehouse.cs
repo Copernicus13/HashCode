@@ -6,6 +6,8 @@ namespace Google.HashCode.ConsoleApplication
 {
     public class Warehouse
     {
+        public int Id { get; set; }
+
         public Point Position { get; set; }
 
         public IList<int> NbItemsOfType { get; set; }

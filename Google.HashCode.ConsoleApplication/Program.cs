@@ -52,7 +52,8 @@ namespace Google.HashCode.ConsoleApplication
                 words = line.Split(' ');
                 var wh = new Warehouse(nbProductType)
                     {
-                        Position = new Point(int.Parse(words[0]), int.Parse(words[1]))
+                        Position = new Point(int.Parse(words[0]), int.Parse(words[1])),
+                        Id = i
                     };
 
                 // Products stored
@@ -76,7 +77,8 @@ namespace Google.HashCode.ConsoleApplication
                 words = line.Split(' ');
                 var ord = new Order(nbProductType)
                     {
-                        Destination = new Point(int.Parse(words[0]), int.Parse(words[1]))
+                        Destination = new Point(int.Parse(words[0]), int.Parse(words[1])),
+                        Id = i
                     };
 
                 // Items count in order, we do not care...
