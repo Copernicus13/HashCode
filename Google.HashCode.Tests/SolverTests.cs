@@ -19,7 +19,7 @@ namespace Google.HashCode.Tests
             var expected = new[]
                 {
                     "0 L 0 2 2", "0 D 0 2 2", "0 L 0 2 1", "0 L 0 0 1", "0 L 0 1 2", "0 D 0 2 1", "0 D 0 0 1",
-                    "0 D 0 1 2", "0 L 0 0 0"
+                    "0 D 0 1 2"
                 };
 
             Assert.That(actual, Is.EqualTo(expected));
