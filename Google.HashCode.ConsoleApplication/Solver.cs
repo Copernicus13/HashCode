@@ -24,15 +24,23 @@ namespace Google.HashCode.ConsoleApplication
         {
             var commands = new List<string>();
 
-            var groups = ComputeProductGroups(order.NbItemsOfType, challenge.productWeights);
+            var groupsOfProduct = ComputeProductGroups(order.NbItemsOfType, challenge.productWeights);
 
-            foreach (var group in groups)
+            foreach (var groupOfProduct in groupsOfProduct)
             {
-                foreach (var product in group.GroupBy(p => p))
+                var products = groupOfProduct as IList<int> ?? groupOfProduct.ToList();
+
+                foreach (var product in products.GroupBy(p => p))
                 {
                     commands.Add(string.Format("{0} L {1} {2} {3}", droneId, warehouse.Id, product.Key, product.Count()));
                 }
+
+                foreach (var product in products.GroupBy(p => p))
+                {
+                    commands.Add(string.Format("{0} D {1} {2} {3}", droneId, order.Id, product.Key, product.Count()));
+                }
             }
+            commands.Add(string.Format("{0} L 0 0 0", droneId));
 
             return commands;
         }
