@@ -126,25 +126,67 @@ namespace Google.HashCode.ConsoleApplication
                 {
                     var drone = line[0];
                     var action = line[1];
-                    var whOrCustNumber = line[2];
-                    var pdNumber = line[3];
-                    var pdQuantity = line[4];
+                    char whOrCustNumber = '';
+                    char pdNumber = '';
+                    char pdQuantity = '';
+                    char turnToWait = '';
+                    int droneInt = Int32.Parse(drone.ToString());
+                    int whOrCustNumberInt = 0;
+                    int pdNumberInt = 0;
+                    int pdQuantityInt = 0;
+                    int turnToWaitInt = 0;
 
-                    // Toutes les commandes sont valides
-                    // Ca plante si c'est pas bon
-                    var droneInt =  Int32.Parse(drone.ToString());
-                    var whOrCustNumberInt = Int32.Parse(whOrCustNumber.ToString());
-                    var pdNumberInt = Int32.Parse(pdNumber.ToString());
-                    var pdQuantityInt = Int32.Parse(pdQuantity.ToString());
-
-                    if(!(action.Equals('D') || action.Equals('L')))
-                        isValid = false;
-
-                    if(!numberToursPerDrone.ContainsKey(droneInt))
-                        numberToursPerDrone.Add(droneInt, CalculMove(action.Equals('D') ? orders[whOrCustNumberInt].Destination : warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1);
+                    if (!action.Equals('W'))
+                    {
+                        turnToWait = line[2];
+                        // Toutes les commandes sont valides
+                        // Ca plante si c'est pas bon
+                        turnToWaitInt = Int32.Parse(turnToWait.ToString());
+                    }
                     else
                     {
-                        numberToursPerDrone[droneInt] += CalculMove(action.Equals('D') ? orders[whOrCustNumberInt].Destination : warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1;
+                        whOrCustNumber = line[2];
+                        pdNumber = line[3];
+                        pdQuantity = line[4];
+                        // Toutes les commandes sont valides
+                        // Ca plante si c'est pas bon
+                        whOrCustNumberInt = Int32.Parse(whOrCustNumber.ToString());
+                        pdNumberInt = Int32.Parse(pdNumber.ToString());
+                        pdQuantityInt = Int32.Parse(pdQuantity.ToString());
+                    }
+                    
+                    if (!(action.Equals('D') || action.Equals('L') || action.Equals('U') || action.Equals('W')))
+                        isValid = false;
+
+                    if (!numberToursPerDrone.ContainsKey(droneInt))
+                    {
+                        if (action.Equals('D'))
+                        {
+                            numberToursPerDrone.Add(droneInt, CalculMove(orders[whOrCustNumberInt].Destination , dronesPosition[droneInt]) + 1);
+                        }
+                        else if (action.Equals('L') || action.Equals('U'))
+                        {
+                            numberToursPerDrone.Add(droneInt, CalculMove(warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1);
+                        }
+                        else
+                        {
+                            numberToursPerDrone.Add(droneInt, turnToWaitInt);
+                        }
+                    }
+                    else
+                    {
+                        if (action.Equals('D'))
+                        {
+                            numberToursPerDrone[droneInt] += CalculMove(orders[whOrCustNumberInt].Destination , dronesPosition[droneInt]) + 1;
+                        }
+                        else if (action.Equals('L') || action.Equals('U'))
+                        {
+                            numberToursPerDrone[droneInt] += CalculMove(warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1;
+                        }
+                        else
+                        {
+                            numberToursPerDrone[droneInt] += turnToWaitInt;
+                        }
                     }
 
                     if (!productsQuantity.ContainsKey(whOrCustNumberInt))
@@ -166,14 +208,15 @@ namespace Google.HashCode.ConsoleApplication
                                 productTypeAndQuantity.Add(pdNumberInt, pdQuantityInt);
                                 productsQuantity[whOrCustNumberInt] = productTypeAndQuantity;
                             }
-                    else
-                    {
+                            else
+                            {
                                 productsQuantity[whOrCustNumberInt][pdNumberInt] += pdQuantityInt;
                             }
                         }
                     }
 
-                    dronesPosition[droneInt] = action.Equals('D') ? orders[whOrCustNumberInt].Destination : warehouses[whOrCustNumberInt].Position;
+                    dronesPosition[droneInt] = action.Equals('D') ? orders[whOrCustNumberInt].Destination : 
+                        (action.Equals('U') || action.Equals('L') ? warehouses[whOrCustNumberInt].Position : dronesPosition[droneInt]);
                 }
                 if (numberToursPerDrone.Values.Max() > nbTurn)
                     isValid = false;
