@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 
 namespace Google.HashCode.ConsoleApplication
@@ -20,10 +21,12 @@ namespace Google.HashCode.ConsoleApplication
         public int nbOrder;
         public IList<Order> orders = new List<Order>();
 
-        public Program(bool bypassInputParsing)
+        public Program(bool bypassInputParsing, StreamReader input)
         {
             if (bypassInputParsing)
                 return;
+            if (input != null)
+                Console.SetIn(input);
 
             // Rows, Columns, Drones, Max turns, Max payload
             string line = Console.ReadLine();
@@ -107,7 +110,7 @@ namespace Google.HashCode.ConsoleApplication
                 for (int i = 0; i < nbDrone; i++)
                 {
                     dronesPosition.Add(warehouses[0].Position);
-                }                    
+                }
 
                 // Conforme à la description
                 if (lines.Count == 0 || lines.Count == 1)
@@ -119,52 +122,53 @@ namespace Google.HashCode.ConsoleApplication
                 }
 
                 // Toutes les commandes ont duré pas plus de T tours
-                var numberToursPerDrone = new Dictionary<int,int>();
+                var numberToursPerDrone = new Dictionary<int, int>();
                 // première clé : customer, seconde clé : product id, value : quantité
                 var productsQuantity = new Dictionary<int, Dictionary<int, int>>();
-                foreach (var line in lines)
+                foreach (var line in lines.Skip(1))
                 {
-                    var drone = line[0];
-                    var action = line[1];
-                    char whOrCustNumber = ' ';
-                    char pdNumber = ' ';
-                    char pdQuantity = ' ';
-                    char turnToWait = ' ';
+                    var words = line.Split(' ');
+                    var drone = words[0];
+                    var action = words[1];
+                    string whOrCustNumber = string.Empty;
+                    string pdNumber = string.Empty;
+                    string pdQuantity = string.Empty;
+                    string turnToWait = string.Empty;
                     int droneInt = Int32.Parse(drone.ToString());
                     int whOrCustNumberInt = 0;
                     int pdNumberInt = 0;
                     int pdQuantityInt = 0;
                     int turnToWaitInt = 0;
 
-                    if (!action.Equals('W'))
+                    if (action.Equals('W'))
                     {
-                        turnToWait = line[2];
+                        turnToWait = words[2];
                         // Toutes les commandes sont valides
                         // Ca plante si c'est pas bon
-                        turnToWaitInt = Int32.Parse(turnToWait.ToString());
+                        turnToWaitInt = Int32.Parse(turnToWait);
                     }
                     else
                     {
-                        whOrCustNumber = line[2];
-                        pdNumber = line[3];
-                        pdQuantity = line[4];
+                        whOrCustNumber = words[2];
+                        pdNumber = words[3];
+                        pdQuantity = words[4];
                         // Toutes les commandes sont valides
                         // Ca plante si c'est pas bon
-                        whOrCustNumberInt = Int32.Parse(whOrCustNumber.ToString());
-                        pdNumberInt = Int32.Parse(pdNumber.ToString());
+                        whOrCustNumberInt = Int32.Parse(whOrCustNumber);
+                        pdNumberInt = Int32.Parse(pdNumber);
                         pdQuantityInt = Int32.Parse(pdQuantity.ToString());
                     }
-                    
-                    if (!(action.Equals('D') || action.Equals('L') || action.Equals('U') || action.Equals('W')))
+
+                    if (!(action.Equals("D") || action.Equals("L") || action.Equals("U") || action.Equals("W")))
                         isValid = false;
 
                     if (!numberToursPerDrone.ContainsKey(droneInt))
                     {
-                        if (action.Equals('D'))
+                        if (action.Equals("D"))
                         {
-                            numberToursPerDrone.Add(droneInt, CalculMove(orders[whOrCustNumberInt].Destination , dronesPosition[droneInt]) + 1);
+                            numberToursPerDrone.Add(droneInt, CalculMove(orders[whOrCustNumberInt].Destination, dronesPosition[droneInt]) + 1);
                         }
-                        else if (action.Equals('L') || action.Equals('U'))
+                        else if (action.Equals("L") || action.Equals("U"))
                         {
                             numberToursPerDrone.Add(droneInt, CalculMove(warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1);
                         }
@@ -175,11 +179,11 @@ namespace Google.HashCode.ConsoleApplication
                     }
                     else
                     {
-                        if (action.Equals('D'))
+                        if (action.Equals("D"))
                         {
-                            numberToursPerDrone[droneInt] += CalculMove(orders[whOrCustNumberInt].Destination , dronesPosition[droneInt]) + 1;
+                            numberToursPerDrone[droneInt] += CalculMove(orders[whOrCustNumberInt].Destination, dronesPosition[droneInt]) + 1;
                         }
-                        else if (action.Equals('L') || action.Equals('U'))
+                        else if (action.Equals("L") || action.Equals("U"))
                         {
                             numberToursPerDrone[droneInt] += CalculMove(warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1;
                         }
@@ -191,16 +195,16 @@ namespace Google.HashCode.ConsoleApplication
 
                     if (!productsQuantity.ContainsKey(whOrCustNumberInt))
                     {
-                        if (action.Equals('D'))
+                        if (action.Equals("D"))
                         {
-                            var productTypeAndQuantity = new Dictionary<int,int>();
+                            var productTypeAndQuantity = new Dictionary<int, int>();
                             productTypeAndQuantity.Add(pdNumberInt, pdQuantityInt);
                             productsQuantity.Add(whOrCustNumberInt, productTypeAndQuantity);
                         }
                     }
                     else
                     {
-                        if (action.Equals('D'))
+                        if (action.Equals("D"))
                         {
                             if (!productsQuantity[whOrCustNumberInt].ContainsKey(pdNumberInt))
                             {
@@ -215,13 +219,13 @@ namespace Google.HashCode.ConsoleApplication
                         }
                     }
 
-                    dronesPosition[droneInt] = action.Equals('D') ? orders[whOrCustNumberInt].Destination : 
-                        (action.Equals('U') || action.Equals('L') ? warehouses[whOrCustNumberInt].Position : dronesPosition[droneInt]);
+                    dronesPosition[droneInt] = action.Equals("D") ? orders[whOrCustNumberInt].Destination :
+                        (action.Equals("U") || action.Equals("L") ? warehouses[whOrCustNumberInt].Position : dronesPosition[droneInt]);
                 }
                 if (numberToursPerDrone.Values.Max() > nbTurn)
                     isValid = false;
 
-                // Pas de nombre d'items dans une commande > au nombre spécifié dans la commande
+                // Pas de nombre d"items dans une commande > au nombre spécifié dans la commande
                 foreach (var productQuantity in productsQuantity)
                 {
                     foreach (var product in productQuantity.Value)
@@ -252,7 +256,7 @@ namespace Google.HashCode.ConsoleApplication
         public static void Main(string[] args)
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Program(false);
+            new Program(false, null);
         }
     }
 }
