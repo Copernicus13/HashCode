@@ -94,7 +94,20 @@ namespace Google.HashCode.ConsoleApplication
 
         public IEnumerable<string> Solve()
         {
-            throw new NotImplementedException();
+            var commands = new List<string>();
+            var droneId = 0;
+
+            foreach (var order in challenge.orders)
+            {
+                var nearestWarehouse = ComputeNearestWarehouse(order, challenge.warehouses);
+                if (nearestWarehouse != null)
+                {
+                    commands.AddRange(ComputeCommands(order, nearestWarehouse, droneId % challenge.nbDrone));
+                }
+                droneId += 1;
+            }
+
+            return commands;
         }
     }
 }
