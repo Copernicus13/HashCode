@@ -100,17 +100,17 @@ namespace Google.HashCode.ConsoleApplication
             {
                 var isValid = true;
                 var dronesPosition = new List<Point>();
-                for (int i = 0 ; i < nbDrone; i++)
+                for (int i = 0; i < nbDrone; i++)
                 {
                     dronesPosition.Add(warehouses[0].Position);
-                }                    
+                }
 
                 // Conforme à la description
                 if (lines.Count == 0 || lines.Count == 1)
                     isValid = false;
                 else
                 {
-                    if((lines.Count - 1) != Int32.Parse(lines[0]))
+                    if ((lines.Count - 1) != Int32.Parse(lines[0]))
                         isValid = false;
                 }
 
@@ -119,7 +119,7 @@ namespace Google.HashCode.ConsoleApplication
                 // Pas de nombre d'items dans une commande > au nombre spécifié dans la commande
 
                 // Toutes les commandes ont duré pas plus de T tours
-                var numberToursPerDrone = new Dictionary<int,int>();
+                var numberToursPerDrone = new Dictionary<int, int>();
                 foreach (var line in lines)
                 {
                     var drone = line[0];
@@ -128,7 +128,7 @@ namespace Google.HashCode.ConsoleApplication
                     var pdNumber = line[3];
                     var pdQuantity = line[4];
 
-                    if(!numberToursPerDrone.ContainsKey(drone))
+                    if (!numberToursPerDrone.ContainsKey(drone))
                         numberToursPerDrone.Add(drone, CalculMove(action.Equals('D') ? orders[whOrCustNumber].Destination : warehouses[whOrCustNumber].Position, dronesPosition[drone]));
                     else
                     {
@@ -148,13 +148,13 @@ namespace Google.HashCode.ConsoleApplication
             }
         }
 
-        public int CalculMove(Point departure, Point arrival)
+        public static int CalculMove(Point departure, Point arrival)
         {
             var result = 0d;
 
-            result = Math.Sqrt(Math.Pow(2, Math.Abs(departure.X - arrival.X)) + Math.Pow(2, Math.Abs(departure.Y - arrival.Y)));
+            result = Math.Sqrt(Math.Pow(Math.Abs(departure.X - arrival.X), 2) + Math.Pow(Math.Abs(departure.Y - arrival.Y), 2));
 
-            return (int) Math.Truncate(result) + 1;
+            return (int)Math.Ceiling(result);
         }
 
 
