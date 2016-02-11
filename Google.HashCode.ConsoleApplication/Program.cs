@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace Google.HashCode.ConsoleApplication
 {
@@ -89,6 +90,71 @@ namespace Google.HashCode.ConsoleApplication
                 orders.Add(ord);
             }
         }
+
+
+        private bool IsValid(List<string> lines)
+        {
+            try
+            {
+                var isValid = true;
+                var dronesPosition = new List<Point>();
+                for (int i = 0 ; i < nbDrone; i++)
+                {
+                    dronesPosition.Add(warehouses[0].Position);
+                }                    
+
+                // Conforme à la description
+                if (lines.Count == 0 || lines.Count == 1)
+                    isValid = false;
+                else
+                {
+                    if((lines.Count - 1) != Int32.Parse(lines[0]))
+                        isValid = false;
+                }
+
+                // Toutes les commandes sont valides
+
+                // Pas de nombre d'items dans une commande > au nombre spécifié dans la commande
+
+                // Toutes les commandes ont duré pas plus de T tours
+                var numberToursPerDrone = new Dictionary<int,int>();
+                foreach (var line in lines)
+                {
+                    var drone = line[0];
+                    var action = line[1];
+                    var whOrCustNumber = line[2];
+                    var pdNumber = line[3];
+                    var pdQuantity = line[4];
+
+                    if(!numberToursPerDrone.ContainsKey(drone))
+                        numberToursPerDrone.Add(drone, CalculMove(action.Equals('D') ? orders[whOrCustNumber].Destination : warehouses[whOrCustNumber].Position, dronesPosition[drone]));
+                    else
+                    {
+                        numberToursPerDrone[drone] += CalculMove(action.Equals('D') ? orders[whOrCustNumber].Destination : warehouses[whOrCustNumber].Position, dronesPosition[drone]);
+                    }
+
+                    dronesPosition[drone] = action.Equals('D') ? orders[whOrCustNumber].Destination : warehouses[whOrCustNumber].Position;
+                }
+                if (numberToursPerDrone.Values.Max() > nbTurn)
+                    isValid = false;
+
+                return isValid;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public int CalculMove(Point departure, Point arrival)
+        {
+            var result = 0d;
+
+            result = Math.Sqrt(Math.Pow(2, Math.Abs(departure.X - arrival.X)) + Math.Pow(2, Math.Abs(departure.Y - arrival.Y)));
+
+            return (int) Math.Truncate(result) + 1;
+        }
+
 
         public static void Main(string[] args)
         {
