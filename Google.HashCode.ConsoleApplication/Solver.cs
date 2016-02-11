@@ -45,7 +45,7 @@ namespace Google.HashCode.ConsoleApplication
             return commands;
         }
 
-        public Warehouse ComputeNearestWarehouse(Order order, IEnumerable<Warehouse> warehouses)
+        public static Warehouse ComputeNearestWarehouse(Order order, IEnumerable<Warehouse> warehouses)
         {
             var possibleWarehouses = new List<Warehouse>();
 
@@ -116,7 +116,7 @@ namespace Google.HashCode.ConsoleApplication
             return commands;
         }
 
-        private void RemoveProducts(Warehouse nearestWarehouse, Order order)
+        private static void RemoveProducts(Warehouse nearestWarehouse, Order order)
         {
             for (int i = 0; i < order.NbItemsOfType.Count; i++)
             {
