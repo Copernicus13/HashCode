@@ -20,8 +20,11 @@ namespace Google.HashCode.ConsoleApplication
         public int nbOrder;
         public IList<Order> orders = new List<Order>();
 
-        public Program()
+        public Program(bool bypassInputParsing)
         {
+            if (bypassInputParsing)
+                return;
+
             // Rows, Columns, Drones, Max turns, Max payload
             string line = Console.ReadLine();
             var words = line.Split(' ');
@@ -94,7 +97,7 @@ namespace Google.HashCode.ConsoleApplication
         }
 
 
-        private bool IsValid(List<string> lines)
+        public bool IsValid(List<string> lines)
         {
             try
             {
@@ -161,7 +164,7 @@ namespace Google.HashCode.ConsoleApplication
         public static void Main(string[] args)
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Program();
+            new Program(false);
         }
     }
 }
