@@ -110,7 +110,7 @@ namespace Google.HashCode.ConsoleApplication
                 for (int i = 0; i < nbDrone; i++)
                 {
                     dronesPosition.Add(warehouses[0].Position);
-                }
+                }                    
 
                 // Conforme à la description
                 if (lines.Count == 0 || lines.Count == 1)
@@ -158,7 +158,7 @@ namespace Google.HashCode.ConsoleApplication
                         pdNumberInt = Int32.Parse(pdNumber);
                         pdQuantityInt = Int32.Parse(pdQuantity.ToString());
                     }
-
+                    
                     if (!(action.Equals("D") || action.Equals("L") || action.Equals("U") || action.Equals("W")))
                         isValid = false;
 
@@ -254,7 +254,18 @@ namespace Google.HashCode.ConsoleApplication
         public static void Main(string[] args)
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Program(false, null);
+            var solver = new Solver(new Program(false, null));
+            var commands = solver.Solve().ToList();
+
+            using (var file = new StreamWriter(args[0] + @".out"))
+            {
+                file.WriteLine(commands.Count.ToString());
+
+                foreach (var command in commands)
+                {
+                    file.WriteLine(command);
+                }
+            }
         }
     }
 }
