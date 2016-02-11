@@ -18,6 +18,7 @@ namespace Google.HashCode.ConsoleApplication
         public Solver(Program challenge)
         {
             this.challenge = challenge;
+            this.challenge.orders = this.challenge.orders.OrderBy(o => o.NbItemsOfType.Sum()).ToList();
         }
 
         public IEnumerable<string> ComputeCommands(Order order, Warehouse warehouse, int droneId)
@@ -40,7 +41,6 @@ namespace Google.HashCode.ConsoleApplication
                     commands.Add(string.Format("{0} D {1} {2} {3}", droneId, order.Id, product.Key, product.Count()));
                 }
             }
-            commands.Add(string.Format("{0} L 0 0 0", droneId));
 
             return commands;
         }
@@ -66,13 +66,14 @@ namespace Google.HashCode.ConsoleApplication
             var completeProductList =
                 productList.Select((p, i) => new Product { Id = i, Weight = productWeightList[i], Count = p })
                            .OrderByDescending(p => p.Weight)
+                           .Where(p => p.Count > 0)
                            .ToList();
 
             while (completeProductList.Any())
             {
                 var currentCount = 0;
                 var newGroupOfProduct = new List<int>();
-                while (currentCount < challenge.maxPayload)
+                while (currentCount < challenge.maxPayload && completeProductList.Any())
                 {
                     if (completeProductList.First().Weight <= challenge.maxPayload - currentCount)
                     {
@@ -83,6 +84,10 @@ namespace Google.HashCode.ConsoleApplication
                         {
                             completeProductList.RemoveAt(0);
                         }
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
 
@@ -103,11 +108,20 @@ namespace Google.HashCode.ConsoleApplication
                 if (nearestWarehouse != null)
                 {
                     commands.AddRange(ComputeCommands(order, nearestWarehouse, droneId % challenge.nbDrone));
+                    RemoveProducts(nearestWarehouse, order);
                 }
                 droneId += 1;
             }
 
             return commands;
+        }
+
+        private void RemoveProducts(Warehouse nearestWarehouse, Order order)
+        {
+            for (int i = 0; i < order.NbItemsOfType.Count; i++)
+            {
+                nearestWarehouse.NbItemsOfType[i] -= order.NbItemsOfType[i];
+            }
         }
     }
 }
