@@ -208,9 +208,7 @@ namespace Google.HashCode.ConsoleApplication
                         {
                             if (!productsQuantity[whOrCustNumberInt].ContainsKey(pdNumberInt))
                             {
-                                var productTypeAndQuantity = new Dictionary<int, int>();
-                                productTypeAndQuantity.Add(pdNumberInt, pdQuantityInt);
-                                productsQuantity[whOrCustNumberInt] = productTypeAndQuantity;
+                                productsQuantity[whOrCustNumberInt].Add(pdNumberInt, pdQuantityInt);
                             }
                             else
                             {
