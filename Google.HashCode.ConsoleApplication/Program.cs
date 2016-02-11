@@ -68,6 +68,9 @@ namespace Google.HashCode.ConsoleApplication
                         Destination = new Point(int.Parse(words[0]), int.Parse(words[1]))
                     };
 
+                // Items count in order, we do not care...
+                Console.ReadLine();
+
                 line = Console.ReadLine();
                 foreach (string s in line.Split(' '))
                     ++ord.NbItemsOfType[int.Parse(s)];
