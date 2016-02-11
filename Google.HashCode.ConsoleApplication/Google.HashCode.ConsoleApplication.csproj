@@ -46,11 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="Painting.cs" />
-    <Compile Include="PaintingMachine.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Order.cs" />
+    <Compile Include="Warehouse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
