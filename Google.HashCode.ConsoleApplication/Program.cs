@@ -102,11 +102,12 @@ namespace Google.HashCode.ConsoleApplication
             try
             {
                 var isValid = true;
+                // Init position
                 var dronesPosition = new List<Point>();
                 for (int i = 0; i < nbDrone; i++)
                 {
                     dronesPosition.Add(warehouses[0].Position);
-                }
+                }                    
 
                 // Conforme à la description
                 if (lines.Count == 0 || lines.Count == 1)
@@ -117,12 +118,10 @@ namespace Google.HashCode.ConsoleApplication
                         isValid = false;
                 }
 
-                // Toutes les commandes sont valides
-
-                // Pas de nombre d'items dans une commande > au nombre spécifié dans la commande
-
                 // Toutes les commandes ont duré pas plus de T tours
-                var numberToursPerDrone = new Dictionary<int, int>();
+                var numberToursPerDrone = new Dictionary<int,int>();
+                // première clé : customer, seconde clé : product id, value : quantité
+                var productsQuantity = new Dictionary<int, Dictionary<int, int>>();
                 foreach (var line in lines)
                 {
                     var drone = line[0];
@@ -131,17 +130,63 @@ namespace Google.HashCode.ConsoleApplication
                     var pdNumber = line[3];
                     var pdQuantity = line[4];
 
-                    if (!numberToursPerDrone.ContainsKey(drone))
-                        numberToursPerDrone.Add(drone, CalculMove(action.Equals('D') ? orders[whOrCustNumber].Destination : warehouses[whOrCustNumber].Position, dronesPosition[drone]));
+                    // Toutes les commandes sont valides
+                    // Ca plante si c'est pas bon
+                    var droneInt =  Int32.Parse(drone.ToString());
+                    var whOrCustNumberInt = Int32.Parse(whOrCustNumber.ToString());
+                    var pdNumberInt = Int32.Parse(pdNumber.ToString());
+                    var pdQuantityInt = Int32.Parse(pdQuantity.ToString());
+
+                    if(!(action.Equals('D') || action.Equals('L')))
+                        isValid = false;
+
+                    if(!numberToursPerDrone.ContainsKey(droneInt))
+                        numberToursPerDrone.Add(droneInt, CalculMove(action.Equals('D') ? orders[whOrCustNumberInt].Destination : warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1);
                     else
                     {
-                        numberToursPerDrone[drone] += CalculMove(action.Equals('D') ? orders[whOrCustNumber].Destination : warehouses[whOrCustNumber].Position, dronesPosition[drone]);
+                        numberToursPerDrone[droneInt] += CalculMove(action.Equals('D') ? orders[whOrCustNumberInt].Destination : warehouses[whOrCustNumberInt].Position, dronesPosition[droneInt]) + 1;
                     }
 
-                    dronesPosition[drone] = action.Equals('D') ? orders[whOrCustNumber].Destination : warehouses[whOrCustNumber].Position;
+                    if (!productsQuantity.ContainsKey(whOrCustNumberInt))
+                    {
+                        if (action.Equals('D'))
+                        {
+                            var productTypeAndQuantity = new Dictionary<int,int>();
+                            productTypeAndQuantity.Add(pdNumberInt, pdQuantityInt);
+                            productsQuantity.Add(whOrCustNumberInt, productTypeAndQuantity);
+                        }
+                    }
+                    else
+                    {
+                        if (action.Equals('D'))
+                        {
+                            if (!productsQuantity[whOrCustNumberInt].ContainsKey(pdNumberInt))
+                            {
+                                var productTypeAndQuantity = new Dictionary<int, int>();
+                                productTypeAndQuantity.Add(pdNumberInt, pdQuantityInt);
+                                productsQuantity[whOrCustNumberInt] = productTypeAndQuantity;
+                            }
+                    else
+                    {
+                                productsQuantity[whOrCustNumberInt][pdNumberInt] += pdQuantityInt;
+                            }
+                        }
+                    }
+
+                    dronesPosition[droneInt] = action.Equals('D') ? orders[whOrCustNumberInt].Destination : warehouses[whOrCustNumberInt].Position;
                 }
                 if (numberToursPerDrone.Values.Max() > nbTurn)
                     isValid = false;
+
+                // Pas de nombre d'items dans une commande > au nombre spécifié dans la commande
+                foreach (var productQuantity in productsQuantity)
+                {
+                    foreach (var product in productQuantity.Value)
+                    {
+                        if (product.Value > orders[productQuantity.Key].NbItemsOfType[product.Key])
+                            isValid = false;
+                    }
+                }
 
                 return isValid;
             }
