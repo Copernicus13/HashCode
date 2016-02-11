@@ -21,6 +21,7 @@ namespace Google.HashCode.ConsoleApplication
 
         public Program()
         {
+            // Rows, Columns, Drones, Max turns, Max payload
             string line = Console.ReadLine();
             var words = line.Split(' ');
             nbRow = int.Parse(words[0]);
@@ -29,18 +30,23 @@ namespace Google.HashCode.ConsoleApplication
             nbTurn = int.Parse(words[3]);
             maxPayload = int.Parse(words[4]);
 
+            // Number of product types
             line = Console.ReadLine();
             nbProductType = int.Parse(line);
 
+            // Product weigths
             line = Console.ReadLine();
             foreach (string s in line.Split(' '))
                 productWeights.Add(int.Parse(s));
 
+            // Number of warehouses
             line = Console.ReadLine();
             nbWarehouse = int.Parse(line);
 
+            // Warehouses data
             for (int i = 0; i < nbWarehouse; ++i)
             {
+                // Location
                 line = Console.ReadLine();
                 words = line.Split(' ');
                 var wh = new Warehouse(nbProductType)
@@ -48,6 +54,7 @@ namespace Google.HashCode.ConsoleApplication
                         Position = new Point(int.Parse(words[0]), int.Parse(words[1]))
                     };
 
+                // Products stored
                 line = Console.ReadLine();
                 int j = 0;
                 foreach (string s in line.Split(' '))
@@ -56,11 +63,14 @@ namespace Google.HashCode.ConsoleApplication
                 warehouses.Add(wh);
             }
 
+            // Number of orders
             line = Console.ReadLine();
             nbOrder = int.Parse(line);
 
+            // Orders data
             for (int i = 0; i < nbOrder; ++i)
             {
+                // Destination
                 line = Console.ReadLine();
                 words = line.Split(' ');
                 var ord = new Order(nbProductType)
@@ -71,6 +81,7 @@ namespace Google.HashCode.ConsoleApplication
                 // Items count in order, we do not care...
                 Console.ReadLine();
 
+                // Product types
                 line = Console.ReadLine();
                 foreach (string s in line.Split(' '))
                     ++ord.NbItemsOfType[int.Parse(s)];
