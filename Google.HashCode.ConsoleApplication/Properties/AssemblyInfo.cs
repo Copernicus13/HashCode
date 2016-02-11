@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Google.HashCode.ConsoleApplication")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HEAVEN KILLERS RELEASE GROUP")]
+[assembly: AssemblyCompany("Sodifrance")]
 [assembly: AssemblyProduct("Google.HashCode.ConsoleApplication")]
-[assembly: AssemblyCopyright("Copyright © HEAVEN KILLERS RELEASE GROUP 2016")]
+[assembly: AssemblyCopyright("Copyright © Sodifrance")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
