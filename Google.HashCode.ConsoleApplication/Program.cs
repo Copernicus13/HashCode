@@ -126,10 +126,10 @@ namespace Google.HashCode.ConsoleApplication
                 {
                     var drone = line[0];
                     var action = line[1];
-                    char whOrCustNumber = '';
-                    char pdNumber = '';
-                    char pdQuantity = '';
-                    char turnToWait = '';
+                    char whOrCustNumber = ' ';
+                    char pdNumber = ' ';
+                    char pdQuantity = ' ';
+                    char turnToWait = ' ';
                     int droneInt = Int32.Parse(drone.ToString());
                     int whOrCustNumberInt = 0;
                     int pdNumberInt = 0;
