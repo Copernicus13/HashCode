@@ -10,7 +10,7 @@ namespace Google.HashCode.Tests
         [Test]
         public void CanComputeCommands()
         {
-            var solver = new Solver(new Program(true) { maxPayload = 400, productWeights = new[] { 100, 50, 200 } });
+            var solver = new Solver(new Program(true, null) { maxPayload = 400, productWeights = new[] { 100, 50, 200 } });
             var order = new Order(5) { Id = 0, NbItemsOfType = new[] { 1, 2, 3 } };
             var warehouse = new Warehouse(5) { Id = 0, NbItemsOfType = new[] { 1, 2, 3 } };
 
