@@ -28,9 +28,9 @@ namespace Google.HashCode.ConsoleApplication
 
             foreach (var group in groups)
             {
-                foreach (var product in group)
+                foreach (var product in group.GroupBy(p => p))
                 {
-                    commands.Add(string.Format("{0} L {1} {2} {3}", droneId, warehouse.Id, 0, 0));
+                    commands.Add(string.Format("{0} L {1} {2} {3}", droneId, warehouse.Id, product.Key, product.Count()));
                 }
             }
 
