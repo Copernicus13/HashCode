@@ -28,7 +28,7 @@ namespace Google.HashCode.Tests
         [Test]
         public void CanComputeProductGroups()
         {
-            var solver = new Solver(new Program(true) { maxPayload = 400 });
+            var solver = new Solver(new Program(true, null) { maxPayload = 400 });
             var productList = new[] { 1, 2, 3 };
             var weightList = new[] { 100, 50, 200 };
 
