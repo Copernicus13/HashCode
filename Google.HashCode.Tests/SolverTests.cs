@@ -37,5 +37,18 @@ namespace Google.HashCode.Tests
             var actual = solver.ComputeProductGroups(productList, weightList);
             Assert.That(actual, Is.EqualTo(expectedList));
         }
+
+        [Test]
+        public void CanComputeProductGroupsIsSemiOptimized()
+        {
+            var solver = new Solver(new Program(true, null) { maxPayload = 500 });
+            var productList = new[] { 2, 2 };
+            var weightList = new[] { 450, 50 };
+
+            IList<IEnumerable<int>> expectedList = new[] { new[] { 0,1 }, new[] { 0, 1 } };
+
+            var actual = solver.ComputeProductGroups(productList, weightList);
+            Assert.That(actual, Is.EqualTo(expectedList));
+        }
     }
 }

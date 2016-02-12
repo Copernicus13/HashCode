@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Google.HashCode.ConsoleApplication
@@ -19,6 +18,21 @@ namespace Google.HashCode.ConsoleApplication
         {
             this.challenge = challenge;
             this.challenge.orders = this.challenge.orders.OrderBy(o => o.NbItemsOfType.Sum()).ToList();
+        }
+
+        public static Warehouse ComputeNearestWarehouse(Order order, IEnumerable<Warehouse> warehouses)
+        {
+            var possibleWarehouses = new List<Warehouse>();
+
+            foreach (var warehouse in warehouses)
+            {
+                if (warehouse.NbItemsOfType.Select((p, i) => p >= order.NbItemsOfType[i]).All(b => b))
+                {
+                    possibleWarehouses.Add(warehouse);
+                }
+            }
+
+            return possibleWarehouses.OrderBy(w => Program.CalculMove(w.Position, order.Destination)).FirstOrDefault();
         }
 
         public IEnumerable<string> ComputeCommands(Order order, Warehouse warehouse, int droneId)
@@ -45,21 +59,6 @@ namespace Google.HashCode.ConsoleApplication
             return commands;
         }
 
-        public static Warehouse ComputeNearestWarehouse(Order order, IEnumerable<Warehouse> warehouses)
-        {
-            var possibleWarehouses = new List<Warehouse>();
-
-            foreach (var warehouse in warehouses)
-            {
-                if (warehouse.NbItemsOfType.Select((p, i) => p >= order.NbItemsOfType[i]).All(b => b))
-                {
-                    possibleWarehouses.Add(warehouse);
-                }
-            }
-
-            return possibleWarehouses.OrderBy(w => Program.CalculMove(w.Position, order.Destination)).FirstOrDefault();
-        }
-
         public IEnumerable<IEnumerable<int>> ComputeProductGroups(IList<int> productList, IList<int> productWeightList)
         {
             IList<IEnumerable<int>> result = new List<IEnumerable<int>>();
@@ -75,14 +74,17 @@ namespace Google.HashCode.ConsoleApplication
                 var newGroupOfProduct = new List<int>();
                 while (currentCount < challenge.maxPayload && completeProductList.Any())
                 {
-                    if (completeProductList.First().Weight <= challenge.maxPayload - currentCount)
+                    var possible =
+                        completeProductList.FirstOrDefault(p => p.Weight <= challenge.maxPayload - currentCount);
+
+                    if (possible != null)
                     {
-                        currentCount += completeProductList.First().Weight;
-                        completeProductList.First().Count -= 1;
-                        newGroupOfProduct.Add(completeProductList.First().Id);
-                        if (completeProductList.First().Count == 0)
+                        currentCount += possible.Weight;
+                        newGroupOfProduct.Add(possible.Id);
+                        completeProductList.First(p => p.Id == possible.Id).Count -= 1;
+                        if (completeProductList.First(p => p.Id == possible.Id).Count == 0)
                         {
-                            completeProductList.RemoveAt(0);
+                            completeProductList.Remove(completeProductList.First(p => p.Id == possible.Id));
                         }
                     }
                     else
@@ -118,7 +120,7 @@ namespace Google.HashCode.ConsoleApplication
 
         private static void RemoveProducts(Warehouse nearestWarehouse, Order order)
         {
-            for (int i = 0; i < order.NbItemsOfType.Count; i++)
+            for (var i = 0; i < order.NbItemsOfType.Count; i++)
             {
                 nearestWarehouse.NbItemsOfType[i] -= order.NbItemsOfType[i];
             }
