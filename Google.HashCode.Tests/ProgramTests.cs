@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Text;
 using Google.HashCode.ConsoleApplication;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -28,7 +29,11 @@ namespace Google.HashCode.Tests
         [Test]
         public void CanIsValid()
         {
-            var input = new StreamReader(@"D:\Development\Google.HashCode\input\small.in");
+            // convert string to StreamReader
+            const string content = "100 100 3 50 500\n3\n100 5 450\n2\n0 0\n5 1 0\n5 5\n0 10 2\n3\n1 1\n2\n2 0\n3 3\n3\n0 0 0\n5 6\n1\n2";
+            var byteArray = Encoding.UTF8.GetBytes(content);
+            var stream = new MemoryStream(byteArray);
+            var input = new StreamReader(stream);
             //Console.SetIn(input);
             var program = new Program(false, input);
             //var lines = new List<string>
