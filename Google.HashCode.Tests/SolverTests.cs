@@ -45,7 +45,7 @@ namespace Google.HashCode.Tests
             var productList = new[] { 2, 2 };
             var weightList = new[] { 450, 50 };
 
-            IList<IEnumerable<int>> expectedList = new[] { new[] { 0,1 }, new[] { 0, 1 } };
+            IList<IEnumerable<int>> expectedList = new[] { new[] { 0, 1 }, new[] { 0, 1 } };
 
             var actual = solver.ComputeProductGroups(productList, weightList);
             Assert.That(actual, Is.EqualTo(expectedList));
