@@ -48,6 +48,43 @@ namespace Google.HashCode.Tests
         }
 
         [Test]
+        public void CanComputeDistanceTakenByCommands()
+        {
+            var solver =
+                new Solver(new Program(true, null)
+                    {
+                        maxPayload = 400,
+                        productWeights = new[] { 100, 50, 200 },
+                        nbProductType = 3,
+                        warehouses =
+                            new List<Warehouse>
+                                {
+                                    new Warehouse(3)
+                                        {
+                                            Id = 0,
+                                            NbItemsOfType = new[] { 1, 2, 3 },
+                                            Position = new Point(5, 2)
+                                        }
+                                },
+                        orders =
+                            new List<Order>
+                                {
+                                    new Order(3)
+                                        {
+                                            Id = 0,
+                                            NbItemsOfType = new[] { 1, 2, 3 },
+                                            Destination = new Point(3, 4)
+                                        }
+                                }
+                    });
+
+            var actual = solver.ComputeDistanceTakenByCommands(new[] { "0 L 0 2 2", "0 D 0 2 2", "0 L 0 2 1" },
+                                                               new Point(0, 0));
+
+            Assert.That(actual, Is.EqualTo(15));
+        }
+
+        [Test]
         public void CanComputeProductGroups()
         {
             var solver = new Solver(new Program(true, null) { maxPayload = 400 });

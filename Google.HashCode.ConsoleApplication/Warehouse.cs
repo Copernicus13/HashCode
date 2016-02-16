@@ -6,15 +6,22 @@ namespace Google.HashCode.ConsoleApplication
 {
     public class Warehouse
     {
-        public int Id { get; set; }
-
-        public Point Position { get; set; }
-
-        public IList<int> NbItemsOfType { get; set; }
-
         public Warehouse(int nbProductTotal)
         {
             NbItemsOfType = Enumerable.Repeat(0, nbProductTotal).ToList();
+        }
+
+        public int Id { get; set; }
+
+        public IList<int> NbItemsOfType { get; set; }
+        public Point Position { get; set; }
+
+        public void RemoveProducts(IEnumerable<int> groupOfProduct)
+        {
+            foreach (var product in groupOfProduct)
+            {
+                this.NbItemsOfType[product] -= 1;
+            }
         }
     }
 }

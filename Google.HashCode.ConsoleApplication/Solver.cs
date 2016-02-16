@@ -47,6 +47,31 @@ namespace Google.HashCode.ConsoleApplication
             return canBeResolved ? commands : new List<string>();
         }
 
+        public int ComputeDistanceTakenByCommands(IEnumerable<string> commands, Point start)
+        {
+            var totalDistance = 0;
+            var last = start;
+            foreach (var command in commands)
+            {
+                var splittedCommand = command.Split(' ');
+                var destination = Point.Empty;
+
+                if (splittedCommand[1] == "D")
+                {
+                    destination = challenge.orders[int.Parse(splittedCommand[2])].Destination;
+                }
+                else if (splittedCommand[1] == "L")
+                {
+                    destination = challenge.warehouses[int.Parse(splittedCommand[2])].Position;
+                }
+
+                totalDistance += 1 + Program.CalculMove(last, destination);
+                last = destination;
+            }
+
+            return totalDistance;
+        }
+
         public Warehouse ComputeNearestWarehouse(IEnumerable<int> groupOfProduct,
                                                  IEnumerable<Warehouse> warehouses, Order order)
         {
@@ -116,9 +141,12 @@ namespace Google.HashCode.ConsoleApplication
             {
                 var droneId =
                     droneList.OrderBy(i => i.Value.Item1)
+                             .ThenBy(d => Program.CalculMove(d.Value.Item2, order.Destination))
                              .First();
+
                 var computedCommands = ComputeCommands(order, droneId.Key).ToList();
                 commands.AddRange(computedCommands);
+
                 droneList[droneId.Key] =
                     Tuple.Create(
                         droneList[droneId.Key].Item1 +
@@ -144,40 +172,9 @@ namespace Google.HashCode.ConsoleApplication
                 commands.Add(string.Format("{0} D {1} {2} {3}", droneId, order.Id, product.Key, product.Count()));
             }
 
-            RemoveProducts(nearestWarehouse, products);
+            nearestWarehouse.RemoveProducts(products);
 
             return commands;
-        }
-
-        private static void RemoveProducts(Warehouse nearestWarehouse, IEnumerable<int> groupOfProduct)
-        {
-            foreach (var product in groupOfProduct)
-            {
-                nearestWarehouse.NbItemsOfType[product] -= 1;
-            }
-        }
-
-        private int ComputeDistanceTakenByCommands(IEnumerable<string> commands, Point start)
-        {
-            var totalDistance = 0;
-            foreach (var command in commands)
-            {
-                var splittedCommand = command.Split(' ');
-                var destination = new Point();
-
-                if (splittedCommand[1] == "D")
-                {
-                    destination = challenge.orders[int.Parse(splittedCommand[2])].Destination;
-                }
-                else if (splittedCommand[1] == "L")
-                {
-                    destination = challenge.warehouses[int.Parse(splittedCommand[2])].Position;
-                }
-
-                totalDistance += Program.CalculMove(start, destination);
-            }
-
-            return totalDistance;
         }
     }
 }
