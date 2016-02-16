@@ -12,7 +12,6 @@ namespace Google.HashCode.ConsoleApplication
         }
 
         public int Id { get; set; }
-
         public IList<int> NbItemsOfType { get; set; }
         public Point Position { get; set; }
 
@@ -20,7 +19,7 @@ namespace Google.HashCode.ConsoleApplication
         {
             foreach (var product in groupOfProduct)
             {
-                this.NbItemsOfType[product] -= 1;
+                NbItemsOfType[product] -= 1;
             }
         }
     }

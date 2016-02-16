@@ -36,7 +36,7 @@ namespace Google.HashCode.Tests
                     });
             var order = new Order(3) { Id = 0, NbItemsOfType = new[] { 1, 2, 3 }, Destination = new Point(0, 0) };
 
-            var actual = solver.ComputeCommands(order, 0);
+            var actual = solver.ComputeCommands(order, 0, Point.Empty);
 
             var expected = new[]
                 {
@@ -82,6 +82,16 @@ namespace Google.HashCode.Tests
                                                                new Point(0, 0));
 
             Assert.That(actual, Is.EqualTo(15));
+        }
+
+        [Test]
+        public void CanComputeDistanceTakenByNoCommandsIsZero()
+        {
+            var solver = new Solver(new Program(true, null));
+
+            var actual = solver.ComputeDistanceTakenByCommands(new string[] { }, new Point(0, 0));
+
+            Assert.That(actual, Is.EqualTo(0));
         }
 
         [Test]

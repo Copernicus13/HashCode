@@ -5,13 +5,6 @@ using System.Linq;
 
 namespace Google.HashCode.ConsoleApplication
 {
-    public class Product
-    {
-        public int Count { get; set; }
-        public int Id { get; set; }
-        public int Weight { get; set; }
-    }
-
     public class Solver
     {
         private readonly Program challenge;
@@ -22,17 +15,19 @@ namespace Google.HashCode.ConsoleApplication
             this.challenge.orders = this.challenge.orders.OrderBy(o => o.NbItemsOfType.Sum()).ToList();
         }
 
-        public IEnumerable<string> ComputeCommands(Order order, int droneId)
+        public IEnumerable<string> ComputeCommands(Order order, int droneId, Point dronePosition,
+                                                   int maxItemsInGroup = 0)
         {
             var canBeResolved = true;
             var commands = new List<string>();
+            var newDronePosition = dronePosition;
 
-            var groupsOfProduct = ComputeProductGroups(order.NbItemsOfType, challenge.productWeights);
+            var groupsOfProduct = ComputeProductGroups(order.NbItemsOfType, challenge.productWeights, maxItemsInGroup);
 
             foreach (var groupOfProduct in groupsOfProduct)
             {
                 var ofProduct = groupOfProduct as IList<int> ?? groupOfProduct.ToList();
-                var nearestWarehouse = ComputeNearestWarehouse(ofProduct, challenge.warehouses, order);
+                var nearestWarehouse = ComputeNearestWarehouse(ofProduct, challenge.warehouses, order, newDronePosition);
                 if (nearestWarehouse != null)
                 {
                     commands.AddRange(ComputeCommandsForOneGroup(ofProduct, nearestWarehouse, order, droneId));
@@ -42,6 +37,7 @@ namespace Google.HashCode.ConsoleApplication
                     canBeResolved = false;
                     break;
                 }
+                newDronePosition = order.Destination;
             }
 
             return canBeResolved ? commands : new List<string>();
@@ -72,8 +68,8 @@ namespace Google.HashCode.ConsoleApplication
             return totalDistance;
         }
 
-        public Warehouse ComputeNearestWarehouse(IEnumerable<int> groupOfProduct,
-                                                 IEnumerable<Warehouse> warehouses, Order order)
+        public Warehouse ComputeNearestWarehouse(IEnumerable<int> groupOfProduct, IEnumerable<Warehouse> warehouses,
+                                                 Order order, Point dronePosition)
         {
             IList<int> listOfProduct = Enumerable.Repeat(0, challenge.nbProductType).ToList();
             groupOfProduct.GroupBy(v => v).ToList().ForEach(g => listOfProduct[g.Key] = g.Count());
@@ -83,11 +79,15 @@ namespace Google.HashCode.ConsoleApplication
 
             return
                 warehouses.Where(w => isPossibleWarehouse(w))
-                          .OrderBy(w => Program.CalculMove(w.Position, order.Destination))
+                          .OrderBy(
+                              w =>
+                              Program.CalculMove(w.Position, order.Destination) +
+                              Program.CalculMove(dronePosition, w.Position))
                           .FirstOrDefault();
         }
 
-        public IEnumerable<IEnumerable<int>> ComputeProductGroups(IList<int> productList, IList<int> productWeightList)
+        public IEnumerable<IEnumerable<int>> ComputeProductGroups(IList<int> productList, IList<int> productWeightList,
+                                                                  int maxItemsInGroup = 0)
         {
             IList<IEnumerable<int>> result = new List<IEnumerable<int>>();
             var completeProductList =
@@ -100,7 +100,8 @@ namespace Google.HashCode.ConsoleApplication
             {
                 var currentCount = 0;
                 var newGroupOfProduct = new List<int>();
-                while (currentCount < challenge.maxPayload && completeProductList.Any())
+                while (currentCount < challenge.maxPayload && completeProductList.Any() &&
+                       (maxItemsInGroup == 0 || newGroupOfProduct.Count < maxItemsInGroup))
                 {
                     var possible =
                         completeProductList.FirstOrDefault(p => p.Weight <= challenge.maxPayload - currentCount);
@@ -139,19 +140,38 @@ namespace Google.HashCode.ConsoleApplication
 
             foreach (var order in challenge.orders)
             {
-                var droneId =
-                    droneList.OrderBy(i => i.Value.Item1)
-                             .ThenBy(d => Program.CalculMove(d.Value.Item2, order.Destination))
-                             .First();
+                var droneId = droneList.OrderBy(i => i.Value.Item1).First();
 
-                var computedCommands = ComputeCommands(order, droneId.Key).ToList();
+                var computedCommands = ComputeCommands(order, droneId.Key, droneId.Value.Item2).ToList();
                 commands.AddRange(computedCommands);
 
-                droneList[droneId.Key] =
-                    Tuple.Create(
-                        droneList[droneId.Key].Item1 +
-                        ComputeDistanceTakenByCommands(computedCommands, droneList[droneId.Key].Item2),
-                        order.Destination);
+                if (computedCommands.Any())
+                {
+                    order.Completed = true;
+
+                    droneList[droneId.Key] =
+                        Tuple.Create(
+                            droneId.Value.Item1 + ComputeDistanceTakenByCommands(computedCommands, droneId.Value.Item2),
+                            order.Destination);
+                }
+            }
+
+            foreach (var order in challenge.orders.Where(o => o.Completed == false))
+            {
+                var droneId = droneList.OrderBy(i => i.Value.Item1).First();
+
+                var computedCommands = ComputeCommands(order, droneId.Key, droneId.Value.Item2, 1).ToList();
+                commands.AddRange(computedCommands);
+
+                if (computedCommands.Any())
+                {
+                    order.Completed = true;
+
+                    droneList[droneId.Key] =
+                        Tuple.Create(
+                            droneId.Value.Item1 + ComputeDistanceTakenByCommands(computedCommands, droneId.Value.Item2),
+                            order.Destination);
+                }
             }
 
             return commands;
