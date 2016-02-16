@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using Google.HashCode.ConsoleApplication;
 using NUnit.Framework;
 
@@ -10,11 +11,32 @@ namespace Google.HashCode.Tests
         [Test]
         public void CanComputeCommands()
         {
-            var solver = new Solver(new Program(true, null) { maxPayload = 400, productWeights = new[] { 100, 50, 200 } });
-            var order = new Order(5) { Id = 0, NbItemsOfType = new[] { 1, 2, 3 } };
-            var warehouse = new Warehouse(5) { Id = 0, NbItemsOfType = new[] { 1, 2, 3 } };
+            var solver =
+                new Solver(new Program(true, null)
+                    {
+                        maxPayload = 400,
+                        productWeights = new[] { 100, 50, 200 },
+                        nbProductType = 3,
+                        warehouses =
+                            new List<Warehouse>
+                                {
+                                    new Warehouse(3)
+                                        {
+                                            Id = 1,
+                                            NbItemsOfType = new[] { 1, 2, 3 },
+                                            Position = new Point(1, 1)
+                                        },
+                                    new Warehouse(3)
+                                        {
+                                            Id = 0,
+                                            NbItemsOfType = new[] { 1, 2, 3 },
+                                            Position = new Point(0, 0)
+                                        }
+                                }
+                    });
+            var order = new Order(3) { Id = 0, NbItemsOfType = new[] { 1, 2, 3 }, Destination = new Point(0, 0) };
 
-            var actual = solver.ComputeCommands(order, warehouse, 0);
+            var actual = solver.ComputeCommands(order, 0);
 
             var expected = new[]
                 {
