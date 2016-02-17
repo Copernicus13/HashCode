@@ -5,6 +5,20 @@ using System.Linq;
 
 namespace Google.HashCode.ConsoleApplication
 {
+    internal struct Drone
+    {
+        public readonly Point CurrentPosition;
+        public readonly int DistanceTraveled;
+        public readonly int Id;
+
+        public Drone(Point currentPosition, int distanceTraveled, int id)
+        {
+            CurrentPosition = currentPosition;
+            DistanceTraveled = distanceTraveled;
+            Id = id;
+        }
+    }
+
     public class Solver
     {
         private readonly Program challenge;
@@ -131,48 +145,16 @@ namespace Google.HashCode.ConsoleApplication
         public IEnumerable<string> Solve()
         {
             var commands = new List<string>();
-            var droneList = new Dictionary<int, Tuple<int, Point>>();
 
+            // L'id du drone est le même que sa position dans la liste
+            var droneList = new List<Drone>();
             for (var i = 0; i < challenge.nbDrone; i++)
             {
-                droneList.Add(i, Tuple.Create(0, challenge.warehouses[0].Position));
+                droneList.Add(new Drone(challenge.warehouses[0].Position, 0, i));
             }
 
-            foreach (var order in challenge.orders)
-            {
-                var droneId = droneList.OrderBy(i => i.Value.Item1).First();
-
-                var computedCommands = ComputeCommands(order, droneId.Key, droneId.Value.Item2).ToList();
-                commands.AddRange(computedCommands);
-
-                if (computedCommands.Any())
-                {
-                    order.Completed = true;
-
-                    droneList[droneId.Key] =
-                        Tuple.Create(
-                            droneId.Value.Item1 + ComputeDistanceTakenByCommands(computedCommands, droneId.Value.Item2),
-                            order.Destination);
-                }
-            }
-
-            foreach (var order in challenge.orders.Where(o => o.Completed == false))
-            {
-                var droneId = droneList.OrderBy(i => i.Value.Item1).First();
-
-                var computedCommands = ComputeCommands(order, droneId.Key, droneId.Value.Item2, 1).ToList();
-                commands.AddRange(computedCommands);
-
-                if (computedCommands.Any())
-                {
-                    order.Completed = true;
-
-                    droneList[droneId.Key] =
-                        Tuple.Create(
-                            droneId.Value.Item1 + ComputeDistanceTakenByCommands(computedCommands, droneId.Value.Item2),
-                            order.Destination);
-                }
-            }
+            commands.AddRange(ComputeRun(droneList, 0));
+            commands.AddRange(ComputeRun(droneList, 1));
 
             return commands;
         }
@@ -193,6 +175,34 @@ namespace Google.HashCode.ConsoleApplication
             }
 
             nearestWarehouse.RemoveProducts(products);
+
+            return commands;
+        }
+
+        private IEnumerable<string> ComputeRun(IList<Drone> droneList, int maxItemsInGroup)
+        {
+            var commands = new List<string>();
+            foreach (var order in challenge.orders.Where(o => o.Completed == false))
+            {
+                var droneId =
+                    droneList.OrderBy(i => i.DistanceTraveled + Program.CalculMove(i.CurrentPosition, order.Destination))
+                             .First();
+
+                var computedCommands =
+                    ComputeCommands(order, droneId.Id, droneId.CurrentPosition, maxItemsInGroup).ToList();
+                commands.AddRange(computedCommands);
+
+                if (computedCommands.Any())
+                {
+                    order.Completed = true;
+
+                    droneList[droneId.Id] = new Drone(order.Destination,
+                                                      droneId.DistanceTraveled +
+                                                      ComputeDistanceTakenByCommands(computedCommands,
+                                                                                     droneId.CurrentPosition),
+                                                      droneId.Id);
+                }
+            }
 
             return commands;
         }
