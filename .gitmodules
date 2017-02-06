@@ -1,0 +1,4 @@
+[submodule "2017/CoperAlgoLib"]
+	path = 2017/CoperAlgoLib
+	url = https://github.com/Copernicus13/Coper-Algo-Lib.git
+	branch = master

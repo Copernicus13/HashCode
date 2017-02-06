@@ -1,0 +1,15 @@
+Spécifiez les motifs des fichiers que vous voulez que git ignore.
+
+Exemple:
+# Aperçus créés par windows
+Thumbs.db
+# Dossiers/fichiers créés par Visual Studio
+*.user
+*.vspscc
+*.suo
+[Bb]in
+[Dd]ebug*/
+obj/
+[Rr]elease*/
+_ReSharper*/
+packages/
