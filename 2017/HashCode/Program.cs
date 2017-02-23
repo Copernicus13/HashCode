@@ -15,18 +15,62 @@ namespace HashCode
             //0 100                         The latency (of endpoint 0) to cache 0 is 100ms.
             //2 200                         The latency (of endpoint 0) to cache 2 is 200ms.
             //1 300                         The latency (of endpoint 0) to cache 1 is 200ms.
-            //500 0                         Endpoint 1 has 500ms datacenter latency and is not connected to a cache.
+            //500 0             Endpoint 1 has 500ms datacenter latency and is not connected to a cache.
             //3 0 1500          1500 requests for video 3 coming from endpoint 0.
             //0 1 1000          1000 requests for video 0 coming from endpoint 1.
             //4 0 500           500 requests for video 4 coming from endpoint 0.
             //1 0 1000          1000 requests for video 1 coming from endpoint 0.
-
+            var input = new string[]
+            {
+                "5 2 4 3 100",
+                "50 50 80 30 110",
+                "1000 3",
+                "0 100",
+                "2 200",
+                "1 300",
+                "500 0",
+                "3 0 1500",
+                "0 1 1000",
+                "4 0 500",
+                "1 0 1000"
+            };
+            var solver = Program.ParseInput(input);
 
         }
 
-        public static Solver ParseInput()
+        public static Solver ParseInput(IList<string> input)
         {
-            return new Solver();
+            var solver = new Solver();
+
+            // Summary (line 0)
+            input[0].FirstIs<int>(i => solver.VideosCount = i);
+            input[0].SecondIs<int>(i => solver.EndpointsCount = i);
+            input[0].ThirdIs<int>(i => solver.RequestsCount = i);
+            input[0].FourthIs<int>(i => solver.CachesCount = i);
+            input[0].FifthIs<int>(i => solver.CacheSize = i);
+
+            // Videos (line 1)
+            for (int i = 0; i < solver.VideosCount; i++)
+            {
+                var video = new Video();
+                video.VideoId = i;
+                input[1].NthIs<int>(i, size => video.Size = size);
+                solver.Videos.Add(video);
+            }
+
+            // Endpoints
+            for (int endpointIndex = 1; endpointIndex < solver.EndpointsCount; endpointIndex++)
+            {
+                var endpoint = new Endpoint();
+                //input[2].NthIs<int>(endpointIndex, size => video.Size = size);
+                //solver.Videos.Add(video);
+            }
+            for (int i = 2; i < solver.EndpointsCount + 2; i++)
+            {
+
+            }
+
+            return solver;
         }
     }
 

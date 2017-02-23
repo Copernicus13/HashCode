@@ -8,6 +8,7 @@ namespace HashCode
 {
     public class Endpoint
     {
+        public int EndpointId { get; set; }
         public int Latency { get; set; }
         public int CachesCount { get; set; }
     }
