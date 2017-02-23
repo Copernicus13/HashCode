@@ -55,7 +55,6 @@ namespace HashCode
                     resultatPourVideo.Endpoints = new List<Tuple<Endpoint, int>>();
                     foreach (var requete in requests)
                     {
-
                         var meilleurCache = requete.Endpoint.Caches.OrderBy(cache => cache.Latency).FirstOrDefault();
                         if (meilleurCache != null && meilleurCache.Latency <= requete.Endpoint.Latency)
                         {
@@ -69,10 +68,8 @@ namespace HashCode
                         }
                     }
                 }
-
                 listeResultat.Add(resultatPourVideo);
             }
-
             return listeResultat;
         }
 
@@ -105,7 +102,6 @@ namespace HashCode
                                     VideoSize = result.Video.Size
                                 });
                             }
-
                             break;
                         }
                     }
