@@ -12,5 +12,10 @@ namespace HashCode
         public int Latency { get; set; }
         public int CachesCount { get; set; }
         public IList<Cache> Caches { get; set; }
+
+        public Endpoint()
+        {
+            this.Caches = new List<Cache>();
+        }
     }
 }
