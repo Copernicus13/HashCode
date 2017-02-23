@@ -13,5 +13,10 @@ namespace HashCode
         {
             this.Caches = new List<Cache>();
         }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}] Latency: {1}ms (CachesCount: {2})", EndpointId, Latency, CachesCount);
+        }
     }
 }
