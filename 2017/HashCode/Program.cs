@@ -35,6 +35,7 @@ namespace HashCode
                 "1 0 1000"
             };
             var solver = Program.ParseInput(input);
+            solver.Solve();
 
             Console.WriteLine("Traitement terminé. A soumettre viiiite !!!");
             Console.Read();
@@ -78,6 +79,7 @@ namespace HashCode
                     var cache = new Cache();
                     input[inputRowNumber].FirstIs<int>(cacheId => cache.CacheId = cacheId);
                     input[inputRowNumber].SecondIs<int>(cacheLatency => cache.Latency = cacheLatency);
+                    endpoint.Caches.Add(cache);
                 }
 
                 solver.Endpoints.Add(endpoint);

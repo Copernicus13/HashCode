@@ -42,6 +42,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
+    <Compile Include="LigneResultat.cs" />
     <Compile Include="Solver.cs" />
     <Compile Include="Video.cs" />
   </ItemGroup>
