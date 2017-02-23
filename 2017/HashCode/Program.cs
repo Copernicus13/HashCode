@@ -41,33 +41,52 @@ namespace HashCode
         public static Solver ParseInput(IList<string> input)
         {
             var solver = new Solver();
+            var inputRowNumber = 0;
 
             // Summary (line 0)
-            input[0].FirstIs<int>(i => solver.VideosCount = i);
-            input[0].SecondIs<int>(i => solver.EndpointsCount = i);
-            input[0].ThirdIs<int>(i => solver.RequestsCount = i);
-            input[0].FourthIs<int>(i => solver.CachesCount = i);
-            input[0].FifthIs<int>(i => solver.CacheSize = i);
+            input[inputRowNumber].FirstIs<int>(i => solver.VideosCount = i);
+            input[inputRowNumber].SecondIs<int>(i => solver.EndpointsCount = i);
+            input[inputRowNumber].ThirdIs<int>(i => solver.RequestsCount = i);
+            input[inputRowNumber].FourthIs<int>(i => solver.CachesCount = i);
+            input[inputRowNumber].FifthIs<int>(i => solver.CacheSize = i);
 
             // Videos (line 1)
-            for (int i = 0; i < solver.VideosCount; i++)
+            inputRowNumber++;
+            for (int videoIndex = 0; videoIndex < solver.VideosCount; videoIndex++)
             {
                 var video = new Video();
-                video.VideoId = i;
-                input[1].NthIs<int>(i, size => video.Size = size);
+                video.VideoId = videoIndex;
+                input[inputRowNumber].NthIs<int>(videoIndex, size => video.Size = size);
                 solver.Videos.Add(video);
             }
 
             // Endpoints
-            for (int endpointIndex = 1; endpointIndex < solver.EndpointsCount; endpointIndex++)
+            for (int endpointIndex = 0; endpointIndex < solver.EndpointsCount; endpointIndex++)
             {
+                inputRowNumber++;
                 var endpoint = new Endpoint();
-                //input[2].NthIs<int>(endpointIndex, size => video.Size = size);
-                //solver.Videos.Add(video);
-            }
-            for (int i = 2; i < solver.EndpointsCount + 2; i++)
-            {
+                endpoint.EndpointId = endpointIndex;
+                input[inputRowNumber].FirstIs<int>(latency => endpoint.Latency = latency);
+                input[inputRowNumber].SecondIs<int>(cachesCount => endpoint.CachesCount = cachesCount);
 
+                for (int cacheIndex = 0; cacheIndex < endpoint.CachesCount; cacheIndex++)
+                {
+                    inputRowNumber++;
+                    var cache = new Cache();
+                    input[inputRowNumber].FirstIs<int>(cacheId => cache.CacheId = cacheId);
+                    input[inputRowNumber].SecondIs<int>(cacheLatency => cache.Latency = cacheLatency);
+                }
+            }
+
+            // Requests 
+            for (int requestIndex = 0; requestIndex < solver.RequestsCount; requestIndex++)
+            {
+                inputRowNumber++;
+                var request = new Request();
+                request.RequestId = requestIndex;
+                input[inputRowNumber].FirstIs<int>(videoId => request.Video = solver.Videos.First(v => v.VideoId == videoId));
+                input[inputRowNumber].SecondIs<int>(endPointId => request.Endpoint = solver.Endpoints.First(e => e.EndpointId == endPointId));
+                input[inputRowNumber].ThirdIs<int>(requestsCount => request.RequestsCount = requestsCount);
             }
 
             return solver;
