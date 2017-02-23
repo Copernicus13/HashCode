@@ -11,5 +11,6 @@ namespace HashCode
         public int EndpointId { get; set; }
         public int Latency { get; set; }
         public int CachesCount { get; set; }
+        public IList<Cache> Caches { get; set; }
     }
 }
