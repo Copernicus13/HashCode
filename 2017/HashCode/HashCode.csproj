@@ -47,6 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Execute.bat" />
+    <None Include="Input\kittens.in" />
+    <None Include="Input\me_at_the_zoo.in" />
+    <None Include="Input\trending_today.in" />
+    <None Include="Input\videos_worth_spreading.in" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CoperAlgoLib\CoperAlgoLib.csproj">
