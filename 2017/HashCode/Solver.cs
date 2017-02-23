@@ -28,6 +28,7 @@ namespace HashCode
             var listeResult = GenererListeResult();
             var listeLigneResultat = ParseListEndPoint(listeResult, new List<LigneResultat>());
 
+            Console.WriteLine($"{listeLigneResultat.GroupBy(x => x.CacheId).Count()}");
             foreach (var ligneResultat in listeLigneResultat.GroupBy(x => x.CacheId))
             {
                 Console.WriteLine($"{ligneResultat.Key} {string.Join(" ", ligneResultat.Select(x => x.VideoId))}");
@@ -97,12 +98,15 @@ namespace HashCode
                     var cacheTemp = resultatTempCopy.GroupBy(res => res.CacheId).FirstOrDefault(group => group.Key == cache.CacheId);
                     if (cacheTemp == null || (cacheTemp.Sum(video => video.VideoSize) + result.Video.Size <= CacheSize))
                     {
-                        resultatTempCopy.Add(new LigneResultat
+                        if (cacheTemp == null || !cacheTemp.Any(video => video.VideoId == result.Video.VideoId))
                         {
-                            CacheId = cache.CacheId,
-                            VideoId = result.Video.VideoId,
-                            VideoSize = result.Video.Size
-                        });
+                            resultatTempCopy.Add(new LigneResultat
+                            {
+                                CacheId = cache.CacheId,
+                                VideoId = result.Video.VideoId,
+                                VideoSize = result.Video.Size
+                            });
+                        }
 
                         break;
                     }

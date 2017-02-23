@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace HashCode
@@ -20,21 +21,28 @@ namespace HashCode
             //0 1 1000          1000 requests for video 0 coming from endpoint 1.
             //4 0 500           500 requests for video 4 coming from endpoint 0.
             //1 0 1000          1000 requests for video 1 coming from endpoint 0.
-            var input = new string[]
+            //var input = new string[]
+            //{
+            //    "5 2 4 3 100",
+            //    "50 50 80 30 110",
+            //    "1000 3",
+            //    "0 100",
+            //    "2 200",
+            //    "1 300",
+            //    "500 0",
+            //    "3 0 1500",
+            //    "0 1 1000",
+            //    "4 0 500",
+            //    "1 0 1000"
+            //};
+
+            var input = new List<string>();
+            using (var j = File.OpenText(@"C:\Users\mbonn\Downloads\me_at_the_zoo.in"))
             {
-                "5 2 4 3 100",
-                "50 50 80 30 110",
-                "1000 3",
-                "0 100",
-                "2 200",
-                "1 300",
-                "500 0",
-                "3 0 1500",
-                "0 1 1000",
-                "4 0 500",
-                "1 0 1000"
-            };
-            var solver = Program.ParseInput(input);
+                while (!j.EndOfStream)
+                    input.Add(j.ReadLine());
+            }
+            var solver = ParseInput(input);
             solver.Solve();
 
             Console.WriteLine("Traitement terminé. A soumettre viiiite !!!");
