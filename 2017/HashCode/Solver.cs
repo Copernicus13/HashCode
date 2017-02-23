@@ -28,10 +28,13 @@ namespace HashCode
             var listeResult = GenererListeResult();
             var listeLigneResultat = ParseListEndPoint(listeResult);
 
-            Console.WriteLine($"{listeLigneResultat.GroupBy(x => x.CacheId).Count()}");
-            foreach (var ligneResultat in listeLigneResultat.GroupBy(x => x.CacheId))
+            Console.WriteLine($"{listeLigneResultat.Count(x => x.Count > 0)}");
+            for (int i = 0; i < listeLigneResultat.Length; i++)
             {
-                Console.WriteLine($"{ligneResultat.Key} {string.Join(" ", ligneResultat.Select(x => x.VideoId))}");
+                if (listeLigneResultat[i].Count > 0)
+                {
+                    Console.WriteLine($"{i} {string.Join(" ", listeLigneResultat[i].Select(x => x.VideoId))}");
+                }
             }
         }
 
@@ -73,34 +76,26 @@ namespace HashCode
             return listeResultat;
         }
 
-        public List<LigneResultat> ParseListEndPoint(List<Result> listResultat)
+        public List<Video>[] ParseListEndPoint(List<Result> listResultat)
         {
-            var resultatTemp = new List<LigneResultat>();
+            var resultatTemp = new List<Video>[CachesCount];
+            for (int i = 0; i < CachesCount; i++)
+            {
+                resultatTemp[i] = new List<Video>();
+            }
 
             foreach (var result in listResultat.OrderByDescending(res => res.MinSumLatency))
             {
-                foreach (var endpoint in result.Endpoints)
+                foreach (var endpoint in result.Endpoints.Where(x => x.Item2 != -1))
                 {
-                    // si item2 == -1
-                    if (endpoint.Item2 == -1)
-                    {
-                        continue;
-                    }
-
-                    // sinon
                     foreach (var cache in endpoint.Item1.Caches.OrderBy(cache => cache.Latency))
                     {
-                        var cacheTemp = resultatTemp.GroupBy(res => res.CacheId).FirstOrDefault(group => group.Key == cache.CacheId);
-                        if (cacheTemp == null || (cacheTemp.Sum(video => video.VideoSize) + result.Video.Size <= CacheSize))
+                        var cacheTemp = resultatTemp[cache.CacheId];
+                        if (cacheTemp.Sum(video => video.Size) + result.Video.Size <= CacheSize)
                         {
-                            if (cacheTemp == null || !cacheTemp.Any(video => video.VideoId == result.Video.VideoId))
+                            if (!cacheTemp.Any(video => video.VideoId == result.Video.VideoId))
                             {
-                                resultatTemp.Add(new LigneResultat
-                                {
-                                    CacheId = cache.CacheId,
-                                    VideoId = result.Video.VideoId,
-                                    VideoSize = result.Video.Size
-                                });
+                                cacheTemp.Add(result.Video);
                             }
                             break;
                         }
