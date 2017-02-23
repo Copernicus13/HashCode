@@ -37,7 +37,7 @@ namespace HashCode
             //};
 
             var input = new List<string>();
-            using (var j = File.OpenText(@"C:\Users\mbonn\Downloads\me_at_the_zoo.in"))
+            using (var j = File.OpenText(@"C:\Users\mbonn\Downloads\videos_worth_spreading.in"))
             {
                 while (!j.EndOfStream)
                     input.Add(j.ReadLine());

@@ -26,7 +26,7 @@ namespace HashCode
         public void Solve()
         {
             var listeResult = GenererListeResult();
-            var listeLigneResultat = ParseListEndPoint(listeResult, new List<LigneResultat>());
+            var listeLigneResultat = ParseListEndPoint(listeResult);
 
             Console.WriteLine($"{listeLigneResultat.GroupBy(x => x.CacheId).Count()}");
             foreach (var ligneResultat in listeLigneResultat.GroupBy(x => x.CacheId))
@@ -76,44 +76,43 @@ namespace HashCode
             return listeResultat;
         }
 
-        public List<LigneResultat> ParseListEndPoint(List<Result> listResultat, List<LigneResultat> resultatTemp)
+        public List<LigneResultat> ParseListEndPoint(List<Result> listResultat)
         {
-            if (listResultat.Count == 0)
-                return resultatTemp;
+            var resultatTemp = new List<LigneResultat>();
 
-            var result = listResultat.OrderByDescending(res => res.MinSumLatency).First();
-            var resultatTempCopy = resultatTemp.ToList();
-
-            foreach (var endpoint in result.Endpoints)
+            foreach (var result in listResultat.OrderByDescending(res => res.MinSumLatency))
             {
-                // si item2 == -1
-                if (endpoint.Item2 == -1)
+                foreach (var endpoint in result.Endpoints)
                 {
-                    continue;
-                }
-
-                // sinon
-                foreach (var cache in endpoint.Item1.Caches.OrderBy(cache => cache.Latency))
-                {
-                    var cacheTemp = resultatTempCopy.GroupBy(res => res.CacheId).FirstOrDefault(group => group.Key == cache.CacheId);
-                    if (cacheTemp == null || (cacheTemp.Sum(video => video.VideoSize) + result.Video.Size <= CacheSize))
+                    // si item2 == -1
+                    if (endpoint.Item2 == -1)
                     {
-                        if (cacheTemp == null || !cacheTemp.Any(video => video.VideoId == result.Video.VideoId))
-                        {
-                            resultatTempCopy.Add(new LigneResultat
-                            {
-                                CacheId = cache.CacheId,
-                                VideoId = result.Video.VideoId,
-                                VideoSize = result.Video.Size
-                            });
-                        }
+                        continue;
+                    }
 
-                        break;
+                    // sinon
+                    foreach (var cache in endpoint.Item1.Caches.OrderBy(cache => cache.Latency))
+                    {
+                        var cacheTemp = resultatTemp.GroupBy(res => res.CacheId).FirstOrDefault(group => group.Key == cache.CacheId);
+                        if (cacheTemp == null || (cacheTemp.Sum(video => video.VideoSize) + result.Video.Size <= CacheSize))
+                        {
+                            if (cacheTemp == null || !cacheTemp.Any(video => video.VideoId == result.Video.VideoId))
+                            {
+                                resultatTemp.Add(new LigneResultat
+                                {
+                                    CacheId = cache.CacheId,
+                                    VideoId = result.Video.VideoId,
+                                    VideoSize = result.Video.Size
+                                });
+                            }
+
+                            break;
+                        }
                     }
                 }
             }
 
-            return ParseListEndPoint(listResultat.OrderByDescending(res => res.MinSumLatency).Skip(1).ToList(), resultatTempCopy);
+            return resultatTemp;
         }
 
         public class Result
