@@ -41,38 +41,53 @@ namespace HashCode
         private List<Result> GenererListeResult()
         {
             var listeResultat = new List<Result>();
-            foreach (var video in Videos)
+            var requetesAvecVideos = new List<Request>[Videos.Count];
+            for (int i = 0; i < Videos.Count; i++)
             {
-                var resultatPourVideo = new Result { Video = video };
-                var requests = Requests.Where(request => request.Video.VideoId == video.VideoId);
-                var endpoints = requests.Select(request => request.Endpoint);
+                requetesAvecVideos[i] = new List<Request>();
+            }
 
+            foreach (var requete in Requests)
+            {
+                requetesAvecVideos[requete.Video.VideoId].Add(requete);
+            }
+
+            for (int i = 0; i < requetesAvecVideos.Length; i++)
+            {
+                var video = Videos.Single(vid => vid.VideoId == i);
+                var resultatPourVideo = new Result { Video = video };
+                
                 if (video.Size > CacheSize)
                 {
-                    resultatPourVideo.MinSumLatency = requests.Sum(requete => requete.Endpoint.Latency * requete.RequestsCount);
-                    resultatPourVideo.Endpoints = requests.Select(requete => Tuple.Create(requete.Endpoint, -1)).ToList();
+                    resultatPourVideo.MinSumLatency = requetesAvecVideos[i].Sum(requete => requete.Endpoint.Latency * requete.RequestsCount);
+                    resultatPourVideo.Endpoints = requetesAvecVideos[i].Select(requete => Tuple.Create(requete.Endpoint, -1)).ToList();
+                    resultatPourVideo.c = requetesAvecVideos[i].Sum(requete => requete.RequestsCount);
                 }
                 else
                 {
+                    resultatPourVideo.c = 0;
                     resultatPourVideo.MinSumLatency = 0;
                     resultatPourVideo.Endpoints = new List<Tuple<Endpoint, int>>();
-                    foreach (var requete in requests)
+                    foreach (var requete in requetesAvecVideos[i])
                     {
                         var meilleurCache = requete.Endpoint.Caches.OrderBy(cache => cache.Latency).FirstOrDefault();
                         if (meilleurCache != null && meilleurCache.Latency <= requete.Endpoint.Latency)
                         {
                             resultatPourVideo.MinSumLatency += meilleurCache.Latency * requete.RequestsCount;
                             resultatPourVideo.Endpoints.Add(Tuple.Create(requete.Endpoint, meilleurCache.CacheId));
+                            resultatPourVideo.c += requete.RequestsCount;
                         }
                         else
                         {
                             resultatPourVideo.MinSumLatency += requete.Endpoint.Latency * requete.RequestsCount;
                             resultatPourVideo.Endpoints.Add(Tuple.Create(requete.Endpoint, -1));
+                            resultatPourVideo.c += requete.RequestsCount;
                         }
                     }
                 }
                 listeResultat.Add(resultatPourVideo);
             }
+                        
             return listeResultat;
         }
 
@@ -84,7 +99,8 @@ namespace HashCode
                 resultatTemp[i] = new List<Video>();
             }
 
-            foreach (var result in listResultat.OrderByDescending(res => res.MinSumLatency))
+            // meilleure version sans OrderByDescending(x => x.c)
+            foreach (var result in listResultat.OrderByDescending(x => x.c).ThenBy(res => res.Video.Size).ThenBy(res => res.MinSumLatency))
             {
                 foreach (var endpoint in result.Endpoints.Where(x => x.Item2 != -1))
                 {
@@ -108,6 +124,7 @@ namespace HashCode
 
         public class Result
         {
+            public int c { get; set; }
             public Video Video { get; set; }
             // Somme des latences minimales
             public long MinSumLatency { get; set; }
