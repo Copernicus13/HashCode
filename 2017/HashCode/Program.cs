@@ -36,6 +36,8 @@ namespace HashCode
             };
             var solver = Program.ParseInput(input);
 
+            Console.WriteLine("Traitement terminé. A soumettre viiiite !!!");
+            Console.Read();
         }
 
         public static Solver ParseInput(IList<string> input)
@@ -57,6 +59,7 @@ namespace HashCode
                 var video = new Video();
                 video.VideoId = videoIndex;
                 input[inputRowNumber].NthIs<int>(videoIndex, size => video.Size = size);
+
                 solver.Videos.Add(video);
             }
 
@@ -76,6 +79,8 @@ namespace HashCode
                     input[inputRowNumber].FirstIs<int>(cacheId => cache.CacheId = cacheId);
                     input[inputRowNumber].SecondIs<int>(cacheLatency => cache.Latency = cacheLatency);
                 }
+
+                solver.Endpoints.Add(endpoint);
             }
 
             // Requests 
@@ -87,6 +92,8 @@ namespace HashCode
                 input[inputRowNumber].FirstIs<int>(videoId => request.Video = solver.Videos.First(v => v.VideoId == videoId));
                 input[inputRowNumber].SecondIs<int>(endPointId => request.Endpoint = solver.Endpoints.First(e => e.EndpointId == endPointId));
                 input[inputRowNumber].ThirdIs<int>(requestsCount => request.RequestsCount = requestsCount);
+
+                solver.Requests.Add(request);
             }
 
             return solver;
